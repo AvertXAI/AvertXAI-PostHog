@@ -311,6 +311,11 @@ services:
         command: /compose/start
         restart: on-failure
         logging: *default-logging
+        # .env.services supplies the service-connection defaults (REDIS_URL,
+        # CLICKHOUSE_HOST/DATABASE, OBJECT_STORAGE_FORCE_PATH_STYLE, the
+        # CLICKHOUSE_*_USER/PASSWORD pairs from users.xml, ...); the environment
+        # block below overrides the secrets and DB creds on top of it.
+        env_file: .env.services
         environment:
             <<: *django-env
             LIVESTREAM_HOST: '${SITE_URL:-https://e.avertxai.com}/livestream'
@@ -357,6 +362,7 @@ services:
         command: ./bin/docker-worker-celery --with-scheduler
         restart: on-failure
         logging: *default-logging
+        env_file: .env.services
         environment:
             <<: *django-env
             POSTHOG_SKIP_MIGRATION_CHECKS: '1'
@@ -382,6 +388,7 @@ services:
         command: python manage.py run_async_migrations --check
         restart: 'no'
         logging: *default-logging
+        env_file: .env.services
         environment:
             <<: *django-env
             SKIP_ASYNC_MIGRATIONS_SETUP: 0
@@ -391,6 +398,7 @@ services:
         command: /compose/temporal-django-worker
         restart: on-failure
         logging: *default-logging
+        env_file: .env.services
         environment:
             <<: *django-env
             TEMPORAL_HOST: temporal
